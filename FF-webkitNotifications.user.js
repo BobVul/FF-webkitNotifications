@@ -77,10 +77,46 @@ window.webkitNotifications.requestPermission = function(callback) {
 // If the origin of the script which executes this method does not have 
 // permission level PERMISSION_ALLOWED, this method will throw a security exception.
 window.webkitNotifications.createNotification = function(iconUrl, title, body) {
-    var options = {
+    // A custom object is necessary, because the creation of a normal
+    // Notification object automatically shows it whereas the webkitNotifications
+    // object is supposed to be shown on a call to .show()
+    var notificationObject = {}
+    
+    notificationObject._title = title;
+    
+    notificationObject._options = {
         body: body,
         icon: iconUrl
     }
     
-    new window.Notification(title, options);
+    notificationObject.show = function() {
+        notificationObject._notification = new window.Notification(notificationObject._title, notificationObject._options);  
+        
+        // Implementing events as simple callbacks for now. Not sure if they're
+        // supposed to be 'proper' events?
+        // TODO: use CustomEvents if necessary.
+        notificationObject._notification.onclick = function() {
+            if (notificationObject.onclick)
+                notificationObject.onclick();
+        };
+        notificationObject._notification.onshow = function() {
+            if (notificationObject.ondisplay)
+                notificationObject.ondisplay();
+        };
+        notificationObject._notification.onerror = function() {
+            if (notificationObject.onerror)
+                notificationObject.onerror();
+        };
+        notificationObject._notification.onclose = function() {
+            if (notificationObject.onclose)
+                notificationObject.onclose();
+        };
+    }
+    
+    notificationObject.cancel = function() {
+        if (notificationObject._notification)
+            notificationObject._notification.close();
+    };
+    
+    return notificationObject;
 }

@@ -34,7 +34,19 @@ window.webkitNotifications.PERMISSION_DENIED = 2;
 // * PERMISSION_DENIED (2) indicates that the user has explicitly blocked 
 //   scripts with this origin from showing notifications.
 window.webkitNotifications.checkPermission = function() {
-
+    // Retrieve the permission from the native API and translate
+    // into the webkitNotifications expected response.
+    switch (window.Notification.permission) {
+        case "default":
+            return window.webkitNotifications.PERMISSION_NOT_ALLOWED;
+        case "denied":
+            return window.webkitNotifications.PERMISSION_DENIED;
+        case "granted":
+            return window.webkitNotifications.PERMISSION_ALLOWED;
+        default:
+            // The API is broken.
+            throw "window.Notification.permission has an invalid value.";
+    }
 }
 
 // Requests that the user agent ask the user for permission to show 
@@ -45,7 +57,14 @@ window.webkitNotifications.checkPermission = function() {
 // current permission level is PERMISSION_DENIED, the user agent may take 
 // no action in response to requestPermission.
 window.webkitNotifications.requestPermission = function(callback) {
-
+    // Fire off a permission request via the native API and call the callback
+    // in its callback.
+    setTimeout(function() {
+        window.Notification.requestPermission(function() {
+            if (callback)
+                callback();
+        });
+    }, 0);
 }
 
 // Creates a new notification object with the provided content.  
@@ -58,5 +77,10 @@ window.webkitNotifications.requestPermission = function(callback) {
 // If the origin of the script which executes this method does not have 
 // permission level PERMISSION_ALLOWED, this method will throw a security exception.
 window.webkitNotifications.createNotification = function(iconUrl, title, body) {
+    var options = {
+        body: body,
+        icon: iconUrl
+    }
     
+    new window.Notification(title, options);
 }

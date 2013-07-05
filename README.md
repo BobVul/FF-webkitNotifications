@@ -21,3 +21,7 @@ Previously, the [HTML Desktop Notifications](https://addons.mozilla.org/en-us/fi
 ---
 
 Thanks to [Oliver Salzburg](https://github.com/oliversalzburg) for the userscript template (used with permission) and other assistance.
+
+---
+
+Current test page at [http://jsbin.com/eniqus/1/](http://jsbin.com/eniqus/1/)
